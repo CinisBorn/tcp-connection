@@ -2,12 +2,42 @@
 //!
 //! This crate provides types and utilities for TCP handling.
 use std::io::Error;
+
 use std::net::{
     TcpListener, 
     TcpStream, 
     ToSocketAddrs
 };
 
+/// A reusable TCP listener.  
+/// 
+/// [`Connection`] drops the listener once the connection is established.
+pub struct PersistentConnection {
+    listener: TcpListener
+}
+
+impl PersistentConnection {
+    /// Binds a TCP listener to `addr` returing an in instance of `PersistentConnection`.
+    /// 
+    /// # Errors:
+    /// 
+    /// Returns an error if the binding fails. 
+    pub fn new<A: ToSocketAddrs>(addr: A) -> Result<Self, Error> {
+        Ok(Self { 
+            listener: TcpListener::bind(addr)? 
+        })
+    }
+
+    /// Gets a reference to the `PersistentConnection` listener.
+    pub fn listener(&self) -> &TcpListener {
+        &self.listener
+    }
+
+    /// Creates a `PersistentConnection` instance with a given TCP listener.
+    pub fn new_with_listener(listener: TcpListener) -> Self {
+        Self { listener }
+    }
+}
 
 /// A TCP connection Listener.
 #[derive(Debug)]
