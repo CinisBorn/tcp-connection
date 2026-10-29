@@ -16,11 +16,15 @@ pub struct Connection {
 }
 
 impl Connection {
-    /// Tries to connect to `addr` specified
-    /// 
-    /// # Errors: 
-    /// 
-    /// If any *I/O* error occur, a `ConnectionError` is returned. 
+    /// Binds a TCP listener to `addr` and accepts one incoming connection.
+    ///
+    /// This function blocks until a connection is accepted or an I/O error
+    /// occurs. The listener is dropped after the connection is accepted.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if binding the listener fails or if accepting the
+    /// incoming connection fails.
     pub fn connect<A: ToSocketAddrs>(addr: A) -> Result<Self, Error> {
         let listener = TcpListener::bind(addr)?;
         let stream = listener.accept()?;
@@ -28,11 +32,15 @@ impl Connection {
         Ok(Self { stream: stream.0 })
     }
 
-    /// Tries to connect with a given listener.
-    /// 
-    /// # Errors: 
-    /// 
-    /// If any *I/O* error occur, a `ConnectionError` is returned. 
+    /// Accepts an incoming TCP connection from `listener` and returns a
+    /// `Connection` instance.
+    ///
+    /// This function blocks until a connection is accepted or an I/O error
+    /// occurs.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if accepting the incoming connection fails.
     pub fn connect_with_listener(listener: TcpListener) -> Result<Self, Error>  {
         Ok(Self { stream: listener.accept()?.0 })
     }
