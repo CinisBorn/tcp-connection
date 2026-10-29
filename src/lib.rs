@@ -1,10 +1,13 @@
 //! TCP connection handling.
 //!
 //! This crate provides types and utilities for TCP handling.
-pub mod error;
+use std::io::Error;
+use std::net::{
+    TcpListener, 
+    TcpStream, 
+    ToSocketAddrs
+};
 
-use std::net::{TcpListener, TcpStream, ToSocketAddrs};
-use crate::error::ConnectionError;
 
 /// A TCP connection Listener.
 #[derive(Debug)]
@@ -18,7 +21,7 @@ impl Connection {
     /// # Errors: 
     /// 
     /// If any *I/O* error occur, a `ConnectionError` is returned. 
-    pub fn connect<A: ToSocketAddrs>(addr: A) -> Result<Self, ConnectionError> {
+    pub fn connect<A: ToSocketAddrs>(addr: A) -> Result<Self, Error> {
         let listener = TcpListener::bind(addr)?;
         let stream = listener.accept()?;
         
@@ -30,7 +33,7 @@ impl Connection {
     /// # Errors: 
     /// 
     /// If any *I/O* error occur, a `ConnectionError` is returned. 
-    pub fn connect_with_listener(listener: TcpListener) -> Result<Self, ConnectionError>  {
+    pub fn connect_with_listener(listener: TcpListener) -> Result<Self, Error>  {
         Ok(Self { stream: listener.accept()?.0 })
     }
 
